@@ -5,31 +5,26 @@ class Node:
 
 
 class LinkedList:
-    # TODO: Do generalizing naming of function
-
-    def __init__(self, head_node: Node):
+    def __init__(self, head_node: Node = None):
         self.head_node = head_node
 
     def get_size(self) -> int:
         size: int = 0
-        current_node: Node = Node(None, None)
+        current_node: Node = self.head_node
 
-        if self.head_node == None:
-            return size
-        else:
-            current_node = self.head_node
+        while current_node:
             size += 1
-
-        while current_node.next_node != None:
             current_node = current_node.next_node
-            size += 1
 
         return size
 
     def append(self, new_node: Node):
-        current_node: Node = self.head_node
+        if not self.head_node:
+            self.head_node = new_node
+            return
 
-        while current_node.next_node != None:
+        current_node: Node = self.head_node
+        while current_node.next_node:
             current_node = current_node.next_node
 
         current_node.next_node = new_node
@@ -38,52 +33,59 @@ class LinkedList:
         new_node.next_node = self.head_node
         self.head_node = new_node
 
-    def insert_node_by_index(self, index, new_node: Node):
+    def insert_node_by_index(self, index: int, new_node: Node):
+        if index == 0:
+            self.prepend(new_node)
+            return
+
         current_node: Node = self.head_node
-        previous_node: Node = Node(None, None)
-        for _ in range(index):
-            previous_node = current_node
+        for _ in range(index - 1):
+            if not current_node.next_node:
+                raise IndexError("Index out of bounds")
             current_node = current_node.next_node
 
-        previous_node.next_node = new_node
-        new_node.next_node = current_node
+        new_node.next_node = current_node.next_node
+        current_node.next_node = new_node
 
-    def delete_node_by_index(self, index):
+    def delete_node_by_index(self, index: int):
+        if index == 0:
+            if not self.head_node:
+                raise IndexError("Index out of bounds")
+            self.head_node = self.head_node.next_node
+            return
+
         current_node: Node = self.head_node
-        previous_node: Node = Node(None, None)
-        for _ in range(index):
-            previous_node = current_node
+        for _ in range(index - 1):
+            if not current_node.next_node:
+                raise IndexError("Index out of bounds")
             current_node = current_node.next_node
 
-        previous_node.next_node = current_node.next_node
+        if not current_node.next_node:
+            raise IndexError("Index out of bounds")
+        current_node.next_node = current_node.next_node.next_node
 
     def clear(self):
         self.head_node = None
 
     def get_node_by_index(self, index: int) -> Node:
-        if index == 0:
-            return self.head_node
-        else:
-            current_node: Node = self.head_node
-            for _ in range(index):
-                current_node = current_node.next_node
+        current_node: Node = self.head_node
+        for _ in range(index):
+            if not current_node:
+                raise IndexError("Index out of bounds")
+            current_node = current_node.next_node
 
-            return current_node
+        if not current_node:
+            raise IndexError("Index out of bounds")
+        return current_node
 
-    def get_index_by_searching(self, searching_keyword: str) -> int:
+    def get_index_by_searching(self, search_keyword: str) -> int:
         index: int = 0
         current_node: Node = self.head_node
 
-        if self.get_size() == 0:
-            if current_node.data == searching_keyword:
+        while current_node:
+            if current_node.data == search_keyword:
                 return index
-        else:
-            while current_node.next_node != None:
-                if current_node.data == searching_keyword:
-                    return index
-                else:
-                    current_node = current_node.next_node
-                    index += 1
+            current_node = current_node.next_node
+            index += 1
 
-        # If searching_keyword isn't existed in the linked list
         return -1
